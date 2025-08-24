@@ -4,6 +4,9 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ContentModule } from './features/content/content.module';
+import { CategoriesModule } from './features/categories/categories.module';
+import { Content } from './features/content/entities/content.entity';
+import { Category } from './features/categories/entities/category.entity';
 
 @Module({
   imports: [
@@ -17,7 +20,6 @@ import { ContentModule } from './features/content/content.module';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
-        // entities: [__dirname + '/**/*.entity{.ts,.js}'],
         autoLoadEntities: true,
         logging: true,
         //TODO: use only in DEV
@@ -28,6 +30,7 @@ import { ContentModule } from './features/content/content.module';
       inject: [ConfigService],
     }),
     ContentModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

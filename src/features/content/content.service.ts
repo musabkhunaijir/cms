@@ -5,23 +5,35 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Content } from './entities/content.entity';
 import { YoutubeScraperService } from './youtube-scraper.service';
+import { Category } from '../categories/entities/category.entity';
 
 @Injectable()
 export class ContentService {
   constructor(
     @InjectRepository(Content)
-    private contentRepository: Repository<Content>,
+    private readonly contentRepository: Repository<Content>,
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Category>,
     private readonly youtubeScraperService: YoutubeScraperService,
   ) {}
 
-  addContent(createContentDto: CreateContentDto) {
+  async addContent(createContentDto: CreateContentDto) {
     console.log({ createContentDto });
+
+    const isCategory = await this.categoryRepository.findOne({
+      where: { id: createContentDto.categoryId },
+    });
+
+    if (!isCategory) {
+      throw new NotFoundException('Category not found');
+    }
 
     return this.contentRepository.save(createContentDto);
   }
 
   async getAllContent(pageSize: number, pageNumber: number) {
     const [data, total] = await this.contentRepository.findAndCount({
+      relations: ['category'],
       skip: (pageNumber - 1) * pageSize,
       take: pageSize,
       order: { id: 'DESC' },
@@ -37,11 +49,16 @@ export class ContentService {
   }
 
   async findOne(id: number) {
-    const isExist = await this.contentRepository.findOne({ where: { id } });
+    const content = await this.contentRepository.findOne({
+      where: { id },
+      relations: ['category'],
+    });
 
-    if (!isExist) {
+    if (!content) {
       throw new NotFoundException(`Not found`);
     }
+
+    return content;
   }
 
   async updateContent(id: number, updateContentDto: UpdateContentDto) {
