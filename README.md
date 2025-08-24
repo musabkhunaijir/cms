@@ -5,4 +5,3 @@
 # Configs:
 
 - create a `DB` called `cms`
--
