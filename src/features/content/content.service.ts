@@ -18,8 +18,22 @@ export class ContentService {
     return this.contentRepository.save(createContentDto);
   }
 
-  getAllContent() {
-    return this.contentRepository.findAndCount();
+  getAllContent(pageSize: number, pageNumber: number) {
+    const [data, total] = this.contentRepository.findAndCount({
+      skip: (pageNumber - 1) * pageSize,
+      take: pageSize,
+      order: { id: 'DESC' },
+    });
+
+    const totalPages = Math.ceil(total / pageSize);
+
+    return {
+      data,
+      pageNumber,
+      pageSize,
+      total,
+      totalPages,
+    };
   }
 
   async findOne(id: number) {

@@ -8,6 +8,7 @@ import {
   UsePipes,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { ContentService } from './content.service';
 import { CreateContentDto } from './dto/create-content.dto';
@@ -27,8 +28,11 @@ export class ContentController {
   }
 
   @Get()
-  getAllContent() {
-    return this.contentService.getAllContent();
+  getAllContent(
+    @Query('pageSize') pageSize = 10,
+    @Query('pageNumber') pageNumber = 1,
+  ) {
+    return this.contentService.getAllContent(pageSize, pageNumber);
   }
 
   @Get(':id')
