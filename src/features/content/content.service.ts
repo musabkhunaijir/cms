@@ -4,12 +4,14 @@ import { UpdateContentDto } from './dto/update-content.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Content } from './entities/content.entity';
+import { YoutubeScraperService } from './youtube-scraper.service';
 
 @Injectable()
 export class ContentService {
   constructor(
     @InjectRepository(Content)
     private contentRepository: Repository<Content>,
+    private readonly youtubeScraperService: YoutubeScraperService,
   ) {}
 
   addContent(createContentDto: CreateContentDto) {
@@ -46,5 +48,16 @@ export class ContentService {
     await this.findOne(id);
 
     return this.contentRepository.update({ id }, updateContentDto);
+  }
+
+  async importFromYoutubeScraping(videoId: string) {
+    const metadata = await this.youtubeScraperService.getVideoMetadata(videoId);
+
+    const content = this.contentRepository.create({
+      title: metadata.title,
+      description: metadata.description,
+    });
+
+    return this.contentRepository.save(content);
   }
 }

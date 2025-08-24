@@ -50,4 +50,9 @@ export class ContentController {
   ) {
     await this.contentService.updateContent(+id, updateContentDto);
   }
+
+  @Post('scrape/:videoId')
+  async importFromYoutube(@Param('videoId') videoId: string) {
+    return this.contentService.importFromYoutubeScraping(videoId);
+  }
 }
