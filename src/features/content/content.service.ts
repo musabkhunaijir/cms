@@ -35,8 +35,4 @@ export class ContentService {
 
     return this.contentRepository.update({ id }, updateContentDto);
   }
-
-  remove(id: number) {
-    return `This action removes a #${id} content`;
-  }
 }
